@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- PhotoEditorView to edit photos -->
+    <ja.burhanrashid52.photoeditor.PhotoEditorView
+        android:id="@+id/photoEditorView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/imgPreview" />
+
+    <!-- Spinner to select filter, initially hidden -->
+    <Spinner
+        android:id="@+id/filterSpinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"
+        android:visibility="gone" />
+
+    <!-- LinearLayout to contain buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="16dp">
+
+        <!-- Button to add text -->
+        <Button
+            android:id="@+id/btnAddText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Add Text"
+            android:drawableTop="@drawable/ic_add_text" />
+
+        <!-- Button to draw -->
+        <Button
+            android:id="@+id/btnDraw"
+            android:layout_width="0dp"
+            android:layout_height="79dp"
+            android:layout_weight="1"
+            android:drawableTop="@drawable/ic_draw"
+            android:text="Draw" />
+
+        <!-- Button to add emoji -->
+        <Button
+            android:id="@+id/btnAddEmoji"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Add Emoji"
+            android:drawableTop="@drawable/ic_add_emoji" />
+
+        <!-- Button to apply filter -->
+        <Button
+            android:id="@+id/btnApplyFilter"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Apply Filter"
+            android:drawableTop="@drawable/ic_apply_filter" />
+
+        <!-- Button to save edited photo -->
+        <Button
+            android:id="@+id/btnSave"
+            android:layout_width="0dp"
+            android:layout_height="79dp"
+            android:layout_weight="1"
+            android:drawableTop="@drawable/ic_save"
+            android:text="Save" />
+    </LinearLayout>
+
+</RelativeLayout>
