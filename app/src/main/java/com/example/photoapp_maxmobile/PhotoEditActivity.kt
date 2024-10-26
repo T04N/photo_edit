@@ -1,6 +1,7 @@
 package com.example.photoapp_maxmobile
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
@@ -48,29 +49,12 @@ class PhotoEditActivity : AppCompatActivity() {
         // Initialize PhotoEditor
         photoEditor = PhotoEditor.Builder(this, photoEditorView).build()
         photoEditor.setOnPhotoEditorListener(object : OnPhotoEditorListener {
-            override fun onEditTextChangeListener(rootView: View, text: String, colorCode: Int) {
-                // Handle text change event
-            }
-
-            override fun onAddViewListener(viewType: ja.burhanrashid52.photoeditor.ViewType, numberOfAddedViews: Int) {
-                // Handle add view event
-            }
-
-            override fun onRemoveViewListener(viewType: ja.burhanrashid52.photoeditor.ViewType, numberOfAddedViews: Int) {
-                // Handle remove view event
-            }
-
-            override fun onStartViewChangeListener(viewType: ja.burhanrashid52.photoeditor.ViewType) {
-                // Handle start view change event
-            }
-
-            override fun onStopViewChangeListener(viewType: ja.burhanrashid52.photoeditor.ViewType) {
-                // Handle stop view change event
-            }
-
-            override fun onTouchSourceImage(event: MotionEvent) {
-                // Handle touch event on source image
-            }
+            override fun onEditTextChangeListener(rootView: View, text: String, colorCode: Int) {}
+            override fun onAddViewListener(viewType: ja.burhanrashid52.photoeditor.ViewType, numberOfAddedViews: Int) {}
+            override fun onRemoveViewListener(viewType: ja.burhanrashid52.photoeditor.ViewType, numberOfAddedViews: Int) {}
+            override fun onStartViewChangeListener(viewType: ja.burhanrashid52.photoeditor.ViewType) {}
+            override fun onStopViewChangeListener(viewType: ja.burhanrashid52.photoeditor.ViewType) {}
+            override fun onTouchSourceImage(event: MotionEvent) {}
         })
 
         // Set up buttons
@@ -99,21 +83,18 @@ class PhotoEditActivity : AppCompatActivity() {
         val filterLayout: LinearLayout = findViewById(R.id.filterLayout)
         val filters = PhotoFilter.values()
         filters.forEach { filter ->
-            // Create a container for each filter button and label
             val filterContainer = LinearLayout(this)
             filterContainer.layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)
             filterContainer.orientation = LinearLayout.VERTICAL
             filterContainer.gravity = Gravity.CENTER
 
-            // Create ImageButton for filter
             val filterButton = ImageButton(this)
             filterButton.layoutParams = LinearLayout.LayoutParams(200, 200)
-            filterButton.setImageResource(R.drawable.ic_new_filter) // Replace with appropriate filter icon
+            filterButton.setImageResource(R.drawable.ic_new_filter)
             filterButton.setOnClickListener {
                 photoEditor.setFilterEffect(filter)
             }
 
-            // Create TextView for filter name
             val filterName = TextView(this)
             filterName.layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)
             filterName.text = filter.name
@@ -121,11 +102,8 @@ class PhotoEditActivity : AppCompatActivity() {
             filterName.setTextColor(ContextCompat.getColor(this, android.R.color.white))
             filterName.gravity = Gravity.CENTER
 
-            // Add ImageButton and TextView to container
             filterContainer.addView(filterButton)
             filterContainer.addView(filterName)
-
-            // Add container to filter layout
             filterLayout.addView(filterContainer)
         }
     }
@@ -141,6 +119,12 @@ class PhotoEditActivity : AppCompatActivity() {
                     override fun onSuccess(imagePath: String) {
                         val savedImageUri = Uri.fromFile(File(imagePath))
                         Toast.makeText(this@PhotoEditActivity, "Saved: $savedImageUri", Toast.LENGTH_SHORT).show()
+
+                        val resultIntent = Intent().apply {
+                            putExtra("editedImageUri", savedImageUri)
+                        }
+                        setResult(RESULT_OK, resultIntent)
+                        finish()
                     }
 
                     override fun onFailure(exception: Exception) {

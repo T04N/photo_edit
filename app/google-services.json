@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "578191706609",
+    "project_id": "photoedit-a2c17",
+    "storage_bucket": "photoedit-a2c17.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:578191706609:android:b7de7d7f267bb556965c50",
+        "android_client_info": {
+          "package_name": "com.example.photoapp_maxmobile"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDtD8h2mzAUmsPaRMCHZfWb5UkxiIfiPOE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
