@@ -8,16 +8,31 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.view.Gravity
+import android.view.MotionEvent
+import android.view.View
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.photoapp_maxmobile.setup.FirebaseSetup
 import com.google.firebase.FirebaseApp
+import ja.burhanrashid52.photoeditor.OnPhotoEditorListener
+import ja.burhanrashid52.photoeditor.PhotoEditor
+import ja.burhanrashid52.photoeditor.PhotoEditorView
+import ja.burhanrashid52.photoeditor.PhotoFilter
+import ja.burhanrashid52.photoeditor.SaveSettings
+import ja.burhanrashid52.photoeditor.TextStyleBuilder
 import java.io.File
 import java.io.FileOutputStream
+import java.io.IOException
+import java.util.*
 
 class MainActivity : ComponentActivity() {
 
@@ -35,14 +50,14 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        FirebaseApp.initializeApp(this)
-        FirebaseSetup.initialize()
-
-
         btnCapture = findViewById(R.id.btnCapture)
         btnFromGallery = findViewById(R.id.btnLoadFromGallery)
         btnEditPhoto = findViewById(R.id.btnEdit)
+        btnUpload = findViewById(R.id.btnUpload)
         imgPreview = findViewById(R.id.imgPreview)
+
+        FirebaseApp.initializeApp(this)
+        FirebaseSetup.initialize();
 
         btnCapture.setOnClickListener {
             val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
@@ -76,8 +91,12 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        btnUpload.setOnClickListener() {
-
+        btnUpload.setOnClickListener {
+            if (selectedImageUri != null) {
+                FirebaseSetup.uploadImageToFirebase(selectedImageUri!!, this)
+            } else {
+                Toast.makeText(this, "Vui lòng chọn hoặc chỉnh sửa ảnh trước khi tải lên.", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
@@ -120,3 +139,5 @@ class MainActivity : ComponentActivity() {
         return Uri.fromFile(file)
     }
 }
+
+
