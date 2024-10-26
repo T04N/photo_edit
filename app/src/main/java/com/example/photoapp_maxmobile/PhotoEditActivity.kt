@@ -4,17 +4,17 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
+import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.Spinner
+import android.widget.ImageButton
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
 import android.widget.Toast
-import androidx.activity.ComponentActivity
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.example.photoapp_maxmobile.R
 import ja.burhanrashid52.photoeditor.OnPhotoEditorListener
 import ja.burhanrashid52.photoeditor.PhotoEditor
 import ja.burhanrashid52.photoeditor.PhotoEditorView
@@ -22,15 +22,13 @@ import ja.burhanrashid52.photoeditor.PhotoFilter
 import ja.burhanrashid52.photoeditor.SaveSettings
 import ja.burhanrashid52.photoeditor.TextStyleBuilder
 import java.io.File
-import java.io.FileOutputStream
 import java.io.IOException
 import java.util.*
 
-class PhotoEditActivity : ComponentActivity() {
+class PhotoEditActivity : AppCompatActivity() {
 
     private lateinit var photoEditor: PhotoEditor
     private lateinit var photoEditorView: PhotoEditorView
-    private lateinit var filterSpinner: Spinner
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,6 +41,8 @@ class PhotoEditActivity : ComponentActivity() {
         val imageUri = intent.getParcelableExtra<Uri>("imageUri")
         imageUri?.let {
             photoEditorView.source.setImageURI(it)
+            photoEditorView.source.adjustViewBounds = true
+            photoEditorView.source.scaleType = ImageView.ScaleType.FIT_CENTER
         }
 
         // Initialize PhotoEditor
@@ -77,7 +77,7 @@ class PhotoEditActivity : ComponentActivity() {
         findViewById<View>(R.id.btnAddText).setOnClickListener {
             val textStyleBuilder = TextStyleBuilder()
             textStyleBuilder.withTextColor(ContextCompat.getColor(this, android.R.color.holo_red_dark))
-            photoEditor.addText("Hello World", textStyleBuilder)
+            photoEditor.addText("TEXT EXAMPLE ", textStyleBuilder)
         }
 
         findViewById<View>(R.id.btnDraw).setOnClickListener {
@@ -91,32 +91,42 @@ class PhotoEditActivity : ComponentActivity() {
             photoEditor.addEmoji(randomEmoji)
         }
 
-        findViewById<View>(R.id.btnApplyFilter).setOnClickListener {
-            filterSpinner.visibility = View.VISIBLE
-        }
-
         findViewById<View>(R.id.btnSave).setOnClickListener {
             saveImage()
         }
 
-        // Set up filter spinner
-        filterSpinner = findViewById(R.id.filterSpinner)
-        val filters = PhotoFilter.values().map { it.name.replace("_", " ") }
-        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, filters)
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        filterSpinner.adapter = adapter
-        filterSpinner.visibility = View.GONE
+        // Set up filter task bar
+        val filterLayout: LinearLayout = findViewById(R.id.filterLayout)
+        val filters = PhotoFilter.values()
+        filters.forEach { filter ->
+            // Create a container for each filter button and label
+            val filterContainer = LinearLayout(this)
+            filterContainer.layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+            filterContainer.orientation = LinearLayout.VERTICAL
+            filterContainer.gravity = Gravity.CENTER
 
-        filterSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
-                val selectedFilter = PhotoFilter.valueOf(filters[position].replace(" ", "_"))
-                photoEditor.setFilterEffect(selectedFilter)
-                filterSpinner.visibility = View.GONE
+            // Create ImageButton for filter
+            val filterButton = ImageButton(this)
+            filterButton.layoutParams = LinearLayout.LayoutParams(200, 200)
+            filterButton.setImageResource(R.drawable.ic_new_filter) // Replace with appropriate filter icon
+            filterButton.setOnClickListener {
+                photoEditor.setFilterEffect(filter)
             }
 
-            override fun onNothingSelected(parent: AdapterView<*>) {
-                // Do nothing
-            }
+            // Create TextView for filter name
+            val filterName = TextView(this)
+            filterName.layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+            filterName.text = filter.name
+            filterName.textSize = 12f
+            filterName.setTextColor(ContextCompat.getColor(this, android.R.color.white))
+            filterName.gravity = Gravity.CENTER
+
+            // Add ImageButton and TextView to container
+            filterContainer.addView(filterButton)
+            filterContainer.addView(filterName)
+
+            // Add container to filter layout
+            filterLayout.addView(filterContainer)
         }
     }
 
