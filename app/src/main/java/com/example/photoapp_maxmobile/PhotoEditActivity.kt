@@ -1,18 +1,25 @@
 package com.example.photoapp_maxmobile
 
 import android.Manifest
+import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
+import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.ComponentActivity
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -22,7 +29,9 @@ import ja.burhanrashid52.photoeditor.PhotoEditorView
 import ja.burhanrashid52.photoeditor.PhotoFilter
 import ja.burhanrashid52.photoeditor.SaveSettings
 import ja.burhanrashid52.photoeditor.TextStyleBuilder
+import ja.burhanrashid52.photoeditor.ViewType
 import java.io.File
+import java.io.FileOutputStream
 import java.io.IOException
 import java.util.*
 
@@ -35,10 +44,10 @@ class PhotoEditActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.photo_edit)
 
-        // Initialize PhotoEditorView
+
         photoEditorView = findViewById(R.id.photoEditorView)
 
-        // Get the image passed from MainActivity
+
         val imageUri = intent.getParcelableExtra<Uri>("imageUri")
         imageUri?.let {
             photoEditorView.source.setImageURI(it)
@@ -49,11 +58,13 @@ class PhotoEditActivity : AppCompatActivity() {
         // Initialize PhotoEditor
         photoEditor = PhotoEditor.Builder(this, photoEditorView).build()
         photoEditor.setOnPhotoEditorListener(object : OnPhotoEditorListener {
-            override fun onEditTextChangeListener(rootView: View, text: String, colorCode: Int) {}
-            override fun onAddViewListener(viewType: ja.burhanrashid52.photoeditor.ViewType, numberOfAddedViews: Int) {}
-            override fun onRemoveViewListener(viewType: ja.burhanrashid52.photoeditor.ViewType, numberOfAddedViews: Int) {}
-            override fun onStartViewChangeListener(viewType: ja.burhanrashid52.photoeditor.ViewType) {}
-            override fun onStopViewChangeListener(viewType: ja.burhanrashid52.photoeditor.ViewType) {}
+            override fun onEditTextChangeListener(rootView: View, text: String, colorCode: Int) {
+                showEditTextDialog(rootView, text, colorCode)
+            }
+            override fun onAddViewListener(viewType: ViewType, numberOfAddedViews: Int) {}
+            override fun onRemoveViewListener(viewType: ViewType, numberOfAddedViews: Int) {}
+            override fun onStartViewChangeListener(viewType: ViewType) {}
+            override fun onStopViewChangeListener(viewType: ViewType) {}
             override fun onTouchSourceImage(event: MotionEvent) {}
         })
 
@@ -61,7 +72,7 @@ class PhotoEditActivity : AppCompatActivity() {
         findViewById<View>(R.id.btnAddText).setOnClickListener {
             val textStyleBuilder = TextStyleBuilder()
             textStyleBuilder.withTextColor(ContextCompat.getColor(this, android.R.color.holo_red_dark))
-            photoEditor.addText("TEXT EXAMPLE ", textStyleBuilder)
+            photoEditor.addText("TEXT EXAMPLE", textStyleBuilder)
         }
 
         findViewById<View>(R.id.btnDraw).setOnClickListener {
@@ -106,6 +117,26 @@ class PhotoEditActivity : AppCompatActivity() {
             filterContainer.addView(filterName)
             filterLayout.addView(filterContainer)
         }
+    }
+
+    private fun showEditTextDialog(rootView: View, currentText: String, colorCode: Int) {
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Chỉnh sửa văn bản")
+
+        val input = EditText(this)
+        input.setText(currentText)
+        builder.setView(input)
+
+        builder.setPositiveButton("OK") { _, _ ->
+            val newText = input.text.toString()
+            photoEditor.editText(rootView, newText, colorCode)
+        }
+
+        builder.setNegativeButton("Hủy") { dialog, _ ->
+            dialog.cancel()
+        }
+
+        builder.show()
     }
 
     private fun saveImage() {

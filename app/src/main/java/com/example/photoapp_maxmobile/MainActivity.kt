@@ -1,5 +1,6 @@
 package com.example.photoapp_maxmobile
 
+
 import android.Manifest
 import android.app.Activity
 import android.content.Intent
@@ -12,13 +13,15 @@ import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
 import android.widget.Button
+import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+
+import android.app.AlertDialog
 import androidx.activity.ComponentActivity
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.photoapp_maxmobile.setup.FirebaseSetup
@@ -29,6 +32,7 @@ import ja.burhanrashid52.photoeditor.PhotoEditorView
 import ja.burhanrashid52.photoeditor.PhotoFilter
 import ja.burhanrashid52.photoeditor.SaveSettings
 import ja.burhanrashid52.photoeditor.TextStyleBuilder
+import ja.burhanrashid52.photoeditor.ViewType
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -39,6 +43,7 @@ class MainActivity : ComponentActivity() {
     private lateinit var btnCapture: Button
     private lateinit var btnFromGallery: Button
     private lateinit var btnEditPhoto: Button
+    private lateinit var btnShowImageList: Button
     private lateinit var btnUpload: Button
     private lateinit var imgPreview: ImageView
     private val REQUEST_IMAGE_CAPTURE = 1
@@ -50,14 +55,15 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        FirebaseApp.initializeApp(this)
+        FirebaseSetup.initialize()
+
         btnCapture = findViewById(R.id.btnCapture)
         btnFromGallery = findViewById(R.id.btnLoadFromGallery)
         btnEditPhoto = findViewById(R.id.btnEdit)
         btnUpload = findViewById(R.id.btnUpload)
         imgPreview = findViewById(R.id.imgPreview)
-
-        FirebaseApp.initializeApp(this)
-        FirebaseSetup.initialize();
+        btnShowImageList = findViewById(R.id.btnShowImageList)
 
         btnCapture.setOnClickListener {
             val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
@@ -71,12 +77,14 @@ class MainActivity : ComponentActivity() {
         }
 
         btnFromGallery.setOnClickListener {
-            val selectFromGallery = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED
             ) {
                 ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), REQUEST_IMAGE_SELECT)
             } else {
+                val selectFromGallery = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI).apply {
+                    type = "image/*"
+                }
                 startActivityForResult(selectFromGallery, REQUEST_IMAGE_SELECT)
             }
         }
@@ -87,15 +95,20 @@ class MainActivity : ComponentActivity() {
                 editIntent.putExtra("imageUri", selectedImageUri)
                 startActivityForResult(editIntent, REQUEST_IMAGE_EDIT)
             } else {
-                Toast.makeText(this, "Vui lòng chọn hoặc chụp ảnh trước khi chỉnh sửa.", Toast.LENGTH_SHORT).show()
+                showDialog("Vui lòng chọn hoặc chụp ảnh trước khi chỉnh sửa.")
             }
+        }
+
+        btnShowImageList.setOnClickListener(){
+            val showImagesIntent = Intent(this, imagegridactivityActivity::class.java)
+            startActivity(showImagesIntent)
         }
 
         btnUpload.setOnClickListener {
             if (selectedImageUri != null) {
                 FirebaseSetup.uploadImageToFirebase(selectedImageUri!!, this)
             } else {
-                Toast.makeText(this, "Vui lòng chọn hoặc chỉnh sửa ảnh trước khi tải lên.", Toast.LENGTH_SHORT).show()
+                showDialog("Vui lòng chọn hoặc chỉnh sửa ảnh trước khi tải lên.")
             }
         }
     }
@@ -138,6 +151,14 @@ class MainActivity : ComponentActivity() {
         fileOutputStream.close()
         return Uri.fromFile(file)
     }
+
+    private fun showDialog(message: String) {
+        AlertDialog.Builder(this@MainActivity)
+            .setMessage(message)
+            .setPositiveButton("OK") { dialog, _ ->
+                dialog.dismiss()
+            }
+            .create()
+            .show()
+    }
 }
-
-

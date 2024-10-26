@@ -6,63 +6,83 @@
     android:orientation="vertical"
     android:padding="16dp"
     android:gravity="center"
-    tools:ignore="ExtraText">
+    tools:ignore="ExtraText"
+    android:background="@android:color/white">
 
     <!-- ImageView để hiển thị ảnh đã chọn hoặc chụp -->
     <ImageView
         android:id="@+id/imgPreview"
         android:layout_width="368dp"
         android:layout_height="432dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="24dp"
         android:background="@drawable/image_border"
         android:contentDescription="Preview ảnh"
         android:padding="4dp"
-        android:scaleType="centerCrop" />
+        android:scaleType="centerCrop"
+        android:elevation="4dp" />
 
     <!-- LinearLayout ngang chứa các nút -->
     <LinearLayout
-        style="?android:attr/buttonBarStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_horizontal"
-        android:layout_marginBottom="16dp">
+        android:layout_marginBottom="24dp">
 
         <!-- Nút Chọn Ảnh từ BST -->
         <Button
             android:id="@+id/btnLoadFromGallery"
-            style="?android:attr/buttonBarButtonStyle"
             android:layout_width="0dp"
             android:layout_height="48dp"
             android:layout_weight="1"
+            android:layout_marginEnd="8dp"
             android:background="@drawable/custom_button"
-            android:backgroundTint="#4CAF50"
             android:text="Chọn ảnh từ BST"
-            android:textColor="#FFFFFF" />
+            android:textColor="@android:color/white"
+            android:elevation="2dp"
+            android:textAllCaps="false" />
 
         <!-- Nút Chụp Ảnh -->
         <Button
             android:id="@+id/btnCapture"
-            style="?android:attr/buttonBarButtonStyle"
             android:layout_width="0dp"
             android:layout_height="48dp"
             android:layout_weight="1"
+            android:layout_marginStart="8dp"
             android:background="@drawable/custom_button"
-            android:backgroundTint="#52C34A"
             android:text="Chụp ảnh"
-            android:textColor="#FFFFFF" />
+            android:textColor="@android:color/white"
+            android:elevation="2dp"
+            android:textAllCaps="false" />
     </LinearLayout>
 
-
+    <!-- Nút Chỉnh sửa -->
     <Button
         android:id="@+id/btnEdit"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:background="#FF9800"
-    android:padding="10dp"
-    android:text="Chỉnh sửa"
-    android:textColor="#FFFFFF" />
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/custom_button"
+        android:padding="16dp"
+        android:text="Chỉnh sửa"
+        android:textColor="@android:color/white"
+        android:elevation="2dp"
+        android:textAllCaps="false" />
+
+    <!-- Nút Hiển thị Danh sách Hình ảnh -->
+    <Button
+        android:id="@+id/btnShowImageList"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/custom_button"
+        android:padding="16dp"
+        android:text="Hiển thị Danh sách Hình ảnh"
+        android:textColor="@android:color/white"
+        android:elevation="2dp"
+        android:textAllCaps="false" />
 
     <!-- Nút Upload lên Cloud Storage -->
     <Button
@@ -70,8 +90,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:background="#9C27B0"
-        android:padding="10dp"
+        android:background="@color/purple_700"
+        android:elevation="2dp"
+        android:padding="16dp"
         android:text="Upload lên Cloud Storage"
-        android:textColor="#FFFFFF" />
+        android:textAllCaps="false"
+        android:textColor="@android:color/white" />
 </LinearLayout>
