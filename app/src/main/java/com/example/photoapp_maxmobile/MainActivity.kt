@@ -1,6 +1,5 @@
 package com.example.photoapp_maxmobile
 
-
 import android.Manifest
 import android.app.Activity
 import android.content.Intent
@@ -9,34 +8,16 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
-import android.view.Gravity
-import android.view.MotionEvent
-import android.view.View
 import android.widget.Button
-import android.widget.EditText
-import android.widget.ImageButton
 import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
-import android.widget.Toast
-
-import android.app.AlertDialog
 import androidx.activity.ComponentActivity
-import androidx.core.app.ActivityCompat
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
+import android.app.AlertDialog
 import com.example.photoapp_maxmobile.setup.FirebaseSetup
 import com.google.firebase.FirebaseApp
-import ja.burhanrashid52.photoeditor.OnPhotoEditorListener
-import ja.burhanrashid52.photoeditor.PhotoEditor
-import ja.burhanrashid52.photoeditor.PhotoEditorView
-import ja.burhanrashid52.photoeditor.PhotoFilter
-import ja.burhanrashid52.photoeditor.SaveSettings
-import ja.burhanrashid52.photoeditor.TextStyleBuilder
-import ja.burhanrashid52.photoeditor.ViewType
 import java.io.File
 import java.io.FileOutputStream
-import java.io.IOException
-import java.util.*
 
 class MainActivity : ComponentActivity() {
 
@@ -50,6 +31,24 @@ class MainActivity : ComponentActivity() {
     private val REQUEST_IMAGE_SELECT = 2
     private val REQUEST_IMAGE_EDIT = 3
     private var selectedImageUri: Uri? = null
+
+    private val requestCameraPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+        if (isGranted) {
+            val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE)
+        } else {
+            showDialog("Quyền truy cập máy ảnh đã bị từ chối.")
+        }
+    }
+
+    private val requestGalleryPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+        if (isGranted) {
+            val selectFromGallery = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+            startActivityForResult(selectFromGallery, REQUEST_IMAGE_SELECT)
+        } else {
+            showDialog("Quyền truy cập thư viện đã bị từ chối.")
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,25 +65,25 @@ class MainActivity : ComponentActivity() {
         btnShowImageList = findViewById(R.id.btnShowImageList)
 
         btnCapture.setOnClickListener {
-            val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
-                != PackageManager.PERMISSION_GRANTED
-            ) {
-                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA), REQUEST_IMAGE_CAPTURE)
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                requestCameraPermission.launch(Manifest.permission.CAMERA)
             } else {
+                val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
                 startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE)
             }
         }
 
         btnFromGallery.setOnClickListener {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED
-            ) {
-                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), REQUEST_IMAGE_SELECT)
+            val permission = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+                Manifest.permission.READ_MEDIA_IMAGES
             } else {
-                val selectFromGallery = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI).apply {
-                    type = "image/*"
-                }
+                Manifest.permission.READ_EXTERNAL_STORAGE
+            }
+
+            if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
+                requestGalleryPermission.launch(permission)
+            } else {
+                val selectFromGallery = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
                 startActivityForResult(selectFromGallery, REQUEST_IMAGE_SELECT)
             }
         }
@@ -99,7 +98,7 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        btnShowImageList.setOnClickListener(){
+        btnShowImageList.setOnClickListener {
             val showImagesIntent = Intent(this, imagegridactivityActivity::class.java)
             startActivity(showImagesIntent)
         }
