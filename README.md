@@ -24,8 +24,8 @@ This project is a photo editing application built using **Kotlin** and **Firebas
 
 1. Clone the repository:
 
-   ```bash
-git clone https://github.com/T04N/photo_edit
+   ```bash git clone https://github.com/T04N/photo_edit
+
    ```
 2. Open the project in Android Studio.
 
